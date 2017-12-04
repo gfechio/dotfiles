@@ -43,6 +43,3 @@ call plug#end()
 
 "Theme
 let g:airline_theme='simple'
-" work around booking shit
-let g:syntastic_puppet_validate_disable = 1
-let g:syntastic_puppet_lint_disable = 1
