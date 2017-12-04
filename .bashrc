@@ -20,6 +20,8 @@ export EDITOR=$(which vim)
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
+function is_desktop() { [[ $(hostname) == $DESKTOP_HOSTNAME ]]; }
+
 HISTFILESIZE=20000
 HISTSIZE=20000
 
