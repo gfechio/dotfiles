@@ -1,0 +1,21 @@
+# General .alias file
+#
+alias ll='ls -l'
+alias ls="ls -G"
+alias t='tmux'
+alias lr='ls -R | grep ":$" | sed -e '\''s/:$//'\'' -e '\''s/[^-][^\/]*\//--/g'\'' -e '\''s/^/   /'\'' -e '\''s/-/|/'\'' | less'
+alias gup='for i in $(ll -1 ~/Git/); do cd ~/Git/$i ; git pull ; cd ~; done'
+alias flipt='echo "╯°□°╯︵┻━┻"'
+alias flipn='echo "┬──┬◡ﾉ(° -°ﾉ)"'
+alias fazeoq="echo '¯\_(ツ)_/¯'"
+alias vi=vim
+alias grep='grep --color'
+alias t='tmux -2  source-file /Users/gfechio/.tmux.conf'
+alias gstatus='git-deploy status'
+alias gshow='git-deploy show'
+alias pprun="sudo puppet agent -t"
+alias ppenv="sudo puppet agent -t --environment gfechio"
+alias ppenable="sudo puppet agent -t --enable"
+alias ppdisable="sudo puppet agent -t --disable"
+alias pptest="puppet parser validate"
+alias up="sudo -i"
