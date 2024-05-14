@@ -12,7 +12,7 @@ declare BROWSER="chrome" # other supported values: chrome, firefox
 
 unalias -a
 
-export PATH=$PATH:/usr/local/bin/:/sbin:/usr/sbin:$HOME/bin:/usr/lib64/nagios/plugins/
+export PATH=$PATH:/usr/local/bin/:/sbin:/usr/sbin:$HOME/.bin:
 export PERL5LIB=$PERL5LIB:/usr/local/git_tree/main/lib
 export PATH="/usr/local/bin:$PATH"
 
@@ -109,6 +109,17 @@ cst() {
 }
 
 
+k8s_info() {
+    # Get the current context
+    local context=$(kubectl config current-context)
+    # Get the namespace from the current context
+    local namespace=$(kubectl config view --minify --output 'jsonpath={..namespace}')
+    # If namespace is not set, default to 'default'
+    [[ -z "$namespace" ]] && namespace="default"
+    echo "[$context - $namespace]"
+}
+
+
 __color_="\[\033[33m\]"
 __time="\[\033[33m\][\t]"
 __cur_location="\[\033[01;34m\]\w"
@@ -118,18 +129,21 @@ __last_color="\[\033[00m\]"
 is_desktop && function color_my_prompt {
     local __salt_env_color="\[\033[01;37m\]"
     local __salt_env='`ch show`'
+    local __k8s_color="\[\033[01;35m\]"
     local __user_and_host="\[\033[01;32m\]\u@\h"
     local __git_branch_color="\[\033[31m\]"
-    export PS1="$__color_$__time$__user_and_host $__cur_location $__git_branch_color$__git_branch$__salt_env_color$__salt_env$__prompt_tail$__last_color "
+    export PS1="$__color_$__time$__user_and_host $__cur_location $__git_branch_color$__git_branch$__salt_env_color$__salt_env$__k8s_color\$(k8s_info)$__prompt_tail$__last_color "
 } || function color_my_prompt {
     local __salt_env_color="\[\033[01;37m\]"
     local __salt_env='`ch show`'
+    local __k8s_color="\[\033[01;35m\]"
     local __user_and_host="\[\033[0;31m\]\u@\h"
     local __git_branch_color="\[\033[33m\]"
     local __puppet_env_color="\[\033[01;37m\]"
     local __puppet_env='`ch show`'
-    export PS1="$__color_$__time$__user_and_host $__cur_location $__git_branch_color$__git_branch$__salt_env_color$__salt_env$__prompt_tail$__last_color "
+    export PS1="$__color_$__time$__user_and_host $__cur_location $__git_branch_color$__git_branch$__salt_env_color$__salt_env$__k8s_color\$(k8s_info)$__prompt_tail$__last_color "
 }
+
 color_my_prompt
 
 cores() { 
@@ -137,4 +151,20 @@ cores() {
     do
         printf "\x1b[38;5;${i}mcolour${i}\x1b[0m\n" 
     done
+}
+
+fix-my-ssh() {
+# ssh
+ssh-add -l &>/dev/null
+if [ "$?" == 2 ]; then
+  test -r ~/.ssh-agent && \
+    eval "$(<~/.ssh-agent)" >/dev/null
+
+  ssh-add -l &>/dev/null
+  if [ "$?" == 2 ]; then
+    (umask 066; ssh-agent > ~/.ssh-agent)
+    eval "$(<~/.ssh-agent)" >/dev/null
+    ssh-add
+  fi
+fi
 }
